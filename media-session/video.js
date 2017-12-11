@@ -1,27 +1,26 @@
-let audio = document.createElement('audio');
+let video = document.querySelector('video');
 
 let playlist = getAwesomePlaylist();
 let index = 0;
 
 function onPlayButtonClick() {
-  playAudio();
+  playVideo();
 }
 
-function playAudio() {
-  audio.src = playlist[index].src;
-  audio.play()
+function playVideo() {
+  video.src = playlist[index].src;
+  video.play()
   .then(_ => updateMetadata())
-  .catch(error => log(error));
+  .catch(error => log(error.message));
 }
 
 function updateMetadata() {
   let track = playlist[index];
 
-  log('Playing "' + track.title + '" track...');
+  log('Playing ' + track.title + ' track...');
   navigator.mediaSession.metadata = new MediaMetadata({
     title: track.title,
     artist: track.artist,
-    album: track.album,
     artwork: track.artwork
   });
 }
@@ -31,19 +30,19 @@ function updateMetadata() {
 navigator.mediaSession.setActionHandler('previoustrack', function() {
   log('> User clicked "Previous Track" icon.');
   index = (index - 1 + playlist.length) % playlist.length;
-  playAudio();
+  playVideo();
 });
 
 navigator.mediaSession.setActionHandler('nexttrack', function() {
   log('> User clicked "Next Track" icon.');
   index = (index + 1) % playlist.length;
-  playAudio();
+  playVideo();
 });
 
-audio.addEventListener('ended', function() {
-  // Play automatically the next track when audio ends.
+video.addEventListener('ended', function() {
+  // Play automatically the next track when video ends.
   index = (index - 1 + playlist.length) % playlist.length;
-  playAudio();
+  playVideo();
 });
 
 /* Seek Backward & Seek Forward */
@@ -52,12 +51,26 @@ let skipTime = 10; /* Time to skip in seconds */
 
 navigator.mediaSession.setActionHandler('seekbackward', function() {
   log('> User clicked "Seek Backward" icon.');
-  audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+  video.currentTime = Math.max(video.currentTime - skipTime, 0);
 });
 
 navigator.mediaSession.setActionHandler('seekforward', function() {
   log('> User clicked "Seek Forward" icon.');
-  audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+  video.currentTime = Math.min(video.currentTime + skipTime, video.duration);
+});
+
+/* Play & Pause */
+
+navigator.mediaSession.setActionHandler('play', function() {
+  log('> User clicked "Play" icon.');
+  video.play();
+  // Do something more than just playing video...
+});
+
+navigator.mediaSession.setActionHandler('pause', function() {
+  log('> User clicked "Pause" icon.');
+  video.pause();
+  // Do something more than just pausing video...
 });
 
 /* Utils */
@@ -66,10 +79,9 @@ function getAwesomePlaylist() {
   const BASE_URL = 'https://storage.googleapis.com/media-session/';
 
   return [{
-      src: BASE_URL + 'sintel/snow-fight.mp3',
-      title: 'Snow Fight',
-      artist: 'Jan Morgenstern',
-      album: 'Sintel',
+      src: BASE_URL + 'sintel/trailer.mp4',
+      title: '"Sintel" Trailer, Durian Open Movie Project',
+      artist: 'Blender Foundation',
       artwork: [
         { src: BASE_URL + 'sintel/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
         { src: BASE_URL + 'sintel/artwork-128.png', sizes: '128x128', type: 'image/png' },
@@ -79,10 +91,9 @@ function getAwesomePlaylist() {
         { src: BASE_URL + 'sintel/artwork-512.png', sizes: '512x512', type: 'image/png' },
       ]
     }, {
-      src: BASE_URL + 'big-buck-bunny/prelude.mp3',
-      title: 'Prelude',
-      artist: 'Jan Morgenstern',
-      album: 'Big Buck Bunny',
+      src: BASE_URL + 'big-buck-bunny/trailer.mov',
+      title: '"Big Buck Bunny" Trailer, Peach Open Movie Project',
+      artist: 'Blender Foundation',
       artwork: [
         { src: BASE_URL + 'big-buck-bunny/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
         { src: BASE_URL + 'big-buck-bunny/artwork-128.png', sizes: '128x128', type: 'image/png' },
@@ -92,10 +103,9 @@ function getAwesomePlaylist() {
         { src: BASE_URL + 'big-buck-bunny/artwork-512.png', sizes: '512x512', type: 'image/png' },
       ]
     }, {
-      src: BASE_URL + 'elephants-dream/the-wires.mp3',
-      title: 'The Wires',
-      artist: 'Jan Morgenstern',
-      album: 'Elephants Dream',
+      src: BASE_URL + 'elephants-dream/teaser.mp4',
+      title: '"Elephants Dream" Teaser, Orange Open Movie Project',
+      artist: 'Blender Foundation',
       artwork: [
         { src: BASE_URL + 'elephants-dream/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
         { src: BASE_URL + 'elephants-dream/artwork-128.png', sizes: '128x128', type: 'image/png' },
@@ -105,10 +115,9 @@ function getAwesomePlaylist() {
         { src: BASE_URL + 'elephants-dream/artwork-512.png', sizes: '512x512', type: 'image/png' },
       ]
     }, {
-      src: BASE_URL + 'caminandes/original-score.mp3',
-      title: 'Original Score',
-      artist: 'Jan Morgenstern',
-      album: 'Caminandes 2: Gran Dillama',
+      src: BASE_URL + 'caminandes/short.mp4',
+      title: '"Caminandes 2: Gran Dillama" - Blender Animated Short',
+      artist: 'Blender Foundation',
       artwork: [
         { src: BASE_URL + 'caminandes/artwork-96.png',  sizes: '96x96',   type: 'image/png' },
         { src: BASE_URL + 'caminandes/artwork-128.png', sizes: '128x128', type: 'image/png' },
